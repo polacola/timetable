@@ -13,6 +13,7 @@ from win32com.client import DispatchEx
 import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
 import shutil
+
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
 
@@ -70,42 +71,42 @@ border_NOR = Border(left=Side(border_style='thin', color='000000'),
                     bottom=Side(border_style='thin', color='000000'))
 
 
-def set_font(read_col, cell, ws_new_in_set, row_in_set):
-    if read_col == "Y" and cell.value == "讲课":
+def set_font(read_col, cell, ws_new_in_set, row_in_set, Y, col_list):
+    if read_col == Y and cell.value == "讲课":
         col = 0
-        for each_cell_wb in ws_new_in_set["{}".format(row_in_set)]:
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].font = font_1
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].fill = PatternFill("solid", "C6EFCE")
+        for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_1
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "C6EFCE")
             col += 1
-    elif read_col == "Y" and cell.value == "实验":
+    elif read_col == Y and cell.value == "实验":
         col = 0
-        for each_cell_wb in ws_new_in_set["{}".format(row_in_set)]:
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].font = font_2
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].fill = PatternFill("solid", "FFEB9C")
+        for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_2
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "FFEB9C")
             col += 1
-    elif read_col == "Y" and cell.value == "在线":
+    elif read_col == Y and cell.value == "在线":
         col = 0
-        for each_cell_wb in ws_new_in_set["{}".format(row_in_set)]:
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].font = font_3
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].fill = PatternFill("solid", "e9ebe3")
+        for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_3
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "e9ebe3")
             col += 1
-    elif read_col == "Y" and cell.value == "讨论":
+    elif read_col == Y and cell.value == "讨论":
         col = 0
-        for each_cell_wb in ws_new_in_set["{}".format(row_in_set)]:
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].font = font_4
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].fill = PatternFill("solid", "FFC7CE")
+        for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_4
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "FFC7CE")
             col += 1
-    elif read_col == "Y" and cell.value == "授课性质":
+    elif read_col == Y and cell.value == "授课性质":
         col = 0
-        for each_cell_wb in ws_new_in_set["{}".format(row_in_set)]:
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].font = font_5
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].fill = PatternFill("none")
+        for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_5
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("none")
             col += 1
-    elif read_col == "Y":
+    elif read_col == Y:
         col = 0
-        for each_cell_wb in ws_new_in_set["{}".format(row_in_set)]:
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].font = font_4
-            ws_new_in_set["{}{}".format("ABCDEFGHI"[col], row_in_set)].fill = PatternFill("solid", "FFC7CE")
+        for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_4
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "FFC7CE")
             col += 1
     ws_new_in_set.row_dimensions[row_in_set].height = 40  # 可自定义行高 删除此行可自动换行 课程内容过长时适用（如病理学） 但十分丑陋 建议手动调整
     ws_new_in_set['{}{}'.format(ws_creat_col, row_in_set)].alignment = align
@@ -169,16 +170,17 @@ def pdf_to_imgs(pdf_path, imgs_path, imgs_name):
     # page = pdfDoc.loadPage(0)  # PDF页数
     # pix = page.getPixmap()
     # pix.writePNG(imgs_path)  # 保存 此路径格式不同
-i=1
+
+# 解压===================================
+i = 1
 for file in f_n:
-    if os.path.isfile(r'{}\{}'.format(path, file)) and os.path.splitext(file)[1].lower() == ".zip" :
+    if os.path.isfile(r'{}\{}'.format(path, file)) and os.path.splitext(file)[1].lower() == ".zip":
         shutil.unpack_archive(r'{}\{}'.format(path, file), r'{}'.format(path))
         os.remove(r'{}\{}'.format(path, file))  # 删除下载的压缩文件
-        os.renames(r'{}\{}.xls'.format(path,"教学进度表" ), r'{}\{}.xls'.format(path,i))
-        i+=1
+        os.renames(r'{}\{}.xls'.format(path, "教学进度表"), r'{}\{}.xls'.format(path, i))
+        i += 1
 f_n = os.listdir(path)
-
-
+# =======================================
 
 if not os.path.exists(r"{}\output".format(path)):  # 生成output文件夹
     os.makedirs(r"{}\output".format(path))
@@ -193,7 +195,7 @@ if not os.path.exists(r"{}\output_date\pdf".format(path)):
     os.makedirs(r"{}\output_date\pdf".format(path))
 
 
-# def sort_excel(excel_name):
+# def sort_excel(excel_name):  #样式消失术
 #     # 读取上一步保存的Excel文件
 #     df = pd.read_excel(excel_name, sheet_name="教学进程",header=2)
 #     df_value = df.sort_values(by=["日期","节次"], ascending=True)
@@ -203,19 +205,22 @@ if not os.path.exists(r"{}\output_date\pdf".format(path)):
 #     writer.save()
 
 
-def sort_excel(excel_name):
+def sort_excel(excel_name):  # 注意！此排序不会带着单元格样式一起排序 有时间再重写
     app = xw.App(visible=False, add_book=False)
+    wb = app.books.open(excel_name)
+
+    wb.save(r'{}\output\{}门课程_未排序_有备注.xlsx'.format(path, len(set_course_name_all)))
     wb = app.books.open(excel_name)
     sht = wb.sheets['教学进程']
 
-    atable = sht.range('A4:I{}'.format(row_all_with_data)).value  # 先拿值出来处理
+    atable = sht.range('A4:K{}'.format(row_all_with_data)).value  # 先拿值出来处理 # 临时修改I-》K
     df = pd.DataFrame(atable, columns=['课程名称', '周次', '日期', '星期', "节次", "授课内容", "授课地点", "授课教师",
-                                       "授课性质"])
+                                       "授课性质", "R", "S"])
     sort_df = df.sort_values(by=["日期", "节次"], ascending=True)
     # 使用这个函数进行排序
     # ascending=False 是降序排序
 
-    sht.range('A4:I{}'.format(row_all_with_data)).value = sort_df.values.tolist()
+    sht.range('A4:K{}'.format(row_all_with_data)).value = sort_df.values.tolist()  # 临时修改I-》K
     wb.save(excel_name)
     app.quit()
 
@@ -295,14 +300,19 @@ for file in f_n:
                 row = 3  # 前几行是原来的表头
                 if count_P == 1 and ws_read_col == "P":
                     row_all += row_number_last_read
+                    # print("-------------------------------------row_all="+str(row_all))#调试
                     last_temp = temp  # 用于第二遍读到P  此时的row_all继续增加 用last_temp 回退到上一个值
                     temp = row_all
+                    # print("-------------------------------------temp=" + str(temp))#调试
                     # print(str(row_all)+"更新---------------------")
                 else:
                     row_all = temp
+                    # print("-------------------------------------row_all=" + str(row_all))#调试
+                    # print("-------------------------------------temp=" + str(temp))#调试
                 if (ws_read_col != "R" and ws_read_col != "S" and ws_read_col != "P") or (
                         count_P == 0 and ws_read_col == "P"):
-                    if (count_P == 0 and ws_read_col == "P"): count_P += 1
+                    if (count_P == 0 and ws_read_col == "P"):
+                        count_P += 1
                     ws_creat_col = "ABCDEFGHI"["ABDFGPUWY".index(ws_read_col)]
                     for each_cell in colA_To_P[2:-2]:  # 先不看课程备注信息；最后有两行无用信息
 
@@ -330,22 +340,30 @@ for file in f_n:
                         else:
                             ws_created_all['{}{}'.format(ws_creat_col, row_all)].value = str(each_cell.value).replace(
                                 "\n", "")
-                        set_font(ws_read_col, each_cell, ws_created, row)  # 设置当前行样式
-                        set_font(ws_read_col, each_cell, ws_created_all, row_all)
+                            # 补丁===================================================
+                            ws_created_all["J{}".format(row_all)].value = str(ws_read["R{}".format(row)].value)
+                            ws_created_all["K{}".format(row_all)].value = str(ws_read["S{}".format(row)].value)
+                            # 补丁===================================================# "R"存入j便于重新上色 "S"存入k便于重新上色  十分丑陋
+                            # mark 有空就修
+                        set_font(ws_read_col, each_cell, ws_created, row, "Y", "ABCDEFGHI")  # 设置当前行样式
+                        set_font(ws_read_col, each_cell, ws_created_all, row_all, "Y", "ABCDEFGHIJK")  # mark
+                        # print("-------------------------------------row_all设置样式=" + str(row_all))#调试
                         if flag == True:
                             row_all -= 1  # 标题行在总表只用写一遍，所以row_all要往回一行
                             flag = False
                         row += 1
                         row_all += 1
+                        # print("-------------------------------------row_all+=1=" + str(row_all))#调试
 
 
                 elif (ws_read_col == "R" or ws_read_col == "S") or (ws_read_col == "P"):
 
                     count_print = 0
                     row += 1  # col初始为4 因为有标题
-
+                    # print("-------------------------------------row_all=" + str(row_all))#调试
                     if ws_read_col == "P":
                         row_all = last_temp
+                        # rint("-------------------------------------row_all=" + str(row_all))#调试
                     for each_cell in colA_To_P[3:-2]:
                         if (each_cell.value != "" and ws_read_col != "P") or (
                                 ("在线" in each_cell.value) or ("钉钉" in each_cell.value) or (
@@ -369,20 +387,24 @@ for file in f_n:
                             for each_cell_wb in ws_created["{}".format(row)]:
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
-                                    "solid","e9ebe3")  # PatternFill("none")B8CCE4
+                                    "solid", "e9ebe3")  # PatternFill("none")B8CCE4
 
                                 # print(row_all)
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].font = font_3  # "在线样式"
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].fill = PatternFill(
-                                    "solid","e9ebe3")  # PatternFill("none")B8CCE4
+                                    "solid", "e9ebe3")  # PatternFill("none")B8CCE4
+                                # print("-------------------------------------row_all由于备注被设置为在线样式=" + str(row_all)) #调试
                                 col += 1
 
                         if ws_read_col == "P":
                             set_course_name.add(str(ws_read["H{}".format(row)].value).replace(" ", ""))
                             set_course_name_all.add(str(ws_read["H{}".format(row)].value).replace(" ", ""))
+
                         row += 1
                         row_all += 1
+                        # print("-------------------------------------row_all+=1=" + str(row_all)) #调试
                     row_all = temp
+                    # print("-------------------------------------row_all=temp=" + str(row_all)) #调试
 
             # 信息读取完毕 开始设置新文件列宽和页面布局 （行高已经在之前设置）
             ws_created["A1"].value = "{}".format(new_filename(set_course_name))  # 写入表头
@@ -448,7 +470,39 @@ row_all_with_data = len(ws_created_all["I"])  # 总表行数
 wb_new_all.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 将创建的工作簿保存
 
 wb_new_all.close()  # 最后关闭文件
-sort_excel(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
+sort_excel(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 再改一版
+# =======================施工现场============================
+wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 读取排好序的文件
+ws_read = wb_read[wb_read.sheetnames[0]]  # 反正只会有一张sheet
+for ws_read_col in "IFJK":
+    colI_K = ws_read['{}'.format(ws_read_col)]  # 取一整列
+    row = 4
+    if ws_read_col == "I":
+        for each_cell in colI_K[3:]:
+            set_font(ws_read_col, each_cell, ws_read, row, "I", "ABCDEFGHI")  # 设置当前行样式
+            row += 1
+
+    elif ws_read_col != "I":
+        for each_cell in colI_K[3:]:
+            try:
+                if ("在线" in each_cell.value) or ("钉钉" in each_cell.value) or (  # 不知道为什么会报错，“None”不可迭代 可是前面相同代码没问题
+                        "直播" in each_cell.value) or ("更大" in each_cell.value) or (
+                        "线上" in each_cell.value):
+                    col = 0
+                    for each_cell_wb in "abcdefghi":
+                        ws_read["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
+                        ws_read["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
+                            "solid", "e9ebe3")  # PatternFill("none")B8CCE4
+                        col += 1
+                row += 1
+            except:
+                continue
+ws_read.delete_cols(10)
+ws_read.delete_cols(10)
+wb_read.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 保存回原位置
+wb_read.close()
+# =======================原来我写得这么恶心============================
+
 print(r'写入：output\{}门课程.xlsx'.format(len(set_course_name_all)))
 
 old_txt_file_name = r'{}\output\备注信息_{}.txt'.format(path, date_today)  # 重命名备注txt
