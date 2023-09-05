@@ -4,7 +4,6 @@ from openpyxl.styles import PatternFill
 from openpyxl.styles import Alignment
 from openpyxl.styles import Border, Side
 from openpyxl.worksheet.properties import PageSetupProperties
-# from openpyxl.worksheet.pagebreak import Break
 
 import os
 import time
@@ -12,49 +11,43 @@ import pandas as pd  # 对样式不友好 弃用
 import win32com.client as win32  # pip install pywin32  #用于格式转化
 from win32com.client import DispatchEx
 import fitz  # pdf转图片  #PyMuPDF
-
-import base64
-import hashlib
-import json
-import requests
-
 import xlwings as xw
 
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
 
 align = Alignment(horizontal='center', vertical='center', wrap_text=True)  # 剧中选项
-
+# 每行文字大小相同 暂不支持同一行不同列文字大小单独调整
 font_1 = Font(  # ”讲课“样式
-    name="华光准圆_CNKI", # 字体
+    name="华光准圆_CNKI",  # 字体
     color="006100",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_2 = Font(  # ”实验“样式
-    name="华光准圆_CNKI", # 字体
+    name="华光准圆_CNKI",  # 字体
     color="9C5700",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_3 = Font(  # "在线"样式
-    name="华光准圆_CNKI",# 字体
+    name="华光准圆_CNKI",  # 字体
     color="757672",  # "545454"  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_4 = Font(  # ”讨论“样式 以及 “其他”样式
-    name="华光准圆_CNKI",# 字体
+    name="华光准圆_CNKI",  # 字体
     color="9C0006",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_5 = Font(  # 标题样式
-    name="华光准圆_CNKI",# 字体
+    name="华光准圆_CNKI",  # 字体
     color="000000",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
@@ -62,7 +55,7 @@ font_5 = Font(  # 标题样式
 )
 
 font_title = Font(  # 表头样式
-    name="华光准圆_CNKI",# 字体
+    name="华光准圆_CNKI",  # 字体
     color="000000",  # 颜色
     size=20,  # 设定文字大小
     bold=True,  # 设定为粗体
@@ -120,17 +113,17 @@ def set_font(read_col, cell, ws_new_in_set, row_in_set):
 
 
 def set_col_width(ws_new_in_set, flag_a1=False):
-    ws_new_in_set.column_dimensions['A'].width = 7.0  # 列宽 col_width
+    ws_new_in_set.column_dimensions['A'].width = 5.0  # 列宽 col_width   '课次'
     if flag_a1:
-        ws_new_in_set.column_dimensions['A'].width = 20.0  # 列宽 col_width
-    ws_new_in_set.column_dimensions['B'].width = 7.0
-    ws_new_in_set.column_dimensions['C'].width = 12.0
-    ws_new_in_set.column_dimensions['D'].width = 7.0
-    ws_new_in_set.column_dimensions['E'].width = 7.0
-    ws_new_in_set.column_dimensions['F'].width = 40.0
-    ws_new_in_set.column_dimensions['G'].width = 10.0
-    ws_new_in_set.column_dimensions['H'].width = 10.0
-    ws_new_in_set.column_dimensions['I'].width = 10.0
+        ws_new_in_set.column_dimensions['A'].width = 18.0  # 列宽 col_width 总表此列是课程名称，加宽
+    ws_new_in_set.column_dimensions['B'].width = 5.0  # '周次',
+    ws_new_in_set.column_dimensions['C'].width = 12.0  # '日期',
+    ws_new_in_set.column_dimensions['D'].width = 5.0  # '星期',
+    ws_new_in_set.column_dimensions['E'].width = 5.0  # "节次",
+    ws_new_in_set.column_dimensions['F'].width = 40.0  # "授课内容",
+    ws_new_in_set.column_dimensions['G'].width = 9.0  # "授课地点",
+    ws_new_in_set.column_dimensions['H'].width = 10.0  # "授课教师",
+    ws_new_in_set.column_dimensions['I'].width = 9.0  # "授课性质"
 
 
 def new_filename(set_):
@@ -144,24 +137,6 @@ def new_filename(set_):
     return new_f_name[1:]
 
 
-# def new_excel(): #exec()无法在函数内部修改局部变量 所以无法封装 我知道非常丑陋 但已经没有精力改了 #又不是不能用(•ิ_•ิ)
-#     exec("wb_new{} = Workbook() ".format(a)) # 创建一个工作簿对象 exec(" ".format(a))
-#     # exec("global wb_new{}".format(a))
-#     exec("wb_new{}.pageSetUpPr = PageSetupProperties(fitToPage=True, autoPageBreaks=False)".format(a))
-#     exec("ws_created{} = wb_new{}.create_sheet('教学进程', 0)".format(a,a))# 在索引为0的位置创建一个sheet页
-#     # exec("global ws_created{}".format(a))
-#     exec("ws_created{}.sheet_properties.tabColor = 'ff72BA'".format(a))  # 设置一个颜色（16位）
-#     exec("ws_created{}['A1'].value = '{}'".format(a,os.path.splitext(file)[0]))  # 写入表头(之后更新为课程名称)
-#     exec("ws_created{}['A1'].alignment = align".format(a))
-#     # ws["A1"].border = border_NOR  #默认标题无边框
-#     exec("ws_created{}['A1'].font = font_title".format(a))
-#     exec("ws_created{}.row_dimensions[1].height = 30".format(a))  # 标题行高
-#
-#     exec("ws_created{}.merge_cells('A1:I1')".format(a))
-#     exec("ws_created{}.merge_cells('A2:I2')".format(a))
-#     exec("ws_created{}['A2'].value = '                ver1.0 by CDH{}'".format(a,time.strftime("%Y", time.localtime())))
-#     exec("ws_created{}['A2'].alignment = align".format(a))
-#     exec("ws_created{}['A2'].font = Font(name='华光准圆_CNKI', size=8, bold=False, italic=True)".format(a))
 def excel_to_pdf(excel_path_, pdf_path_):
     xlApp = DispatchEx("Excel.Application")
     xlApp.Visible = False
@@ -207,7 +182,6 @@ if not os.path.exists(r"{}\output_date\excel".format(path)):
     os.makedirs(r"{}\output_date\excel".format(path))
 if not os.path.exists(r"{}\output_date\pdf".format(path)):
     os.makedirs(r"{}\output_date\pdf".format(path))
-
 
 
 # def sort_excel(excel_name):
@@ -369,7 +343,8 @@ for file in f_n:
                                 "直播" in each_cell.value) or ("更大" in each_cell.value) or (
                                         "线上" in each_cell.value)):
                             if count_print == 0: print(
-                                "————————————————————————————————————————————————\n注意！此课程有备注信息，请仔细核对。备注中出现在线、钉钉等字样会设置为浅色填充样式（课程性质不一定为在线）");count_print += 1
+                                "————————————————————————————————————————————————\n注意！此课程有备注信息，请仔细核对。备注"
+                                "中出现在线、钉钉等字样会设置为浅色填充样式（课程性质不一定为在线）");count_print += 1
                             notes = "{0:{6}^4}老师的{1}({2}{3})出现备注信息：日期{5}  {4} ".format(
                                 ws_created["H{}".format(row)].value, "【" + str(ws_read["H{}".format(row)].value) + "】",
                                 ws_read_col, row, each_cell.value, ws_read["D{}".format(row)].value, chr(12288))
@@ -384,13 +359,13 @@ for file in f_n:
                             col = 0
                             for each_cell_wb in ws_created["{}".format(row)]:
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
-                                ws_created["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill("solid",
-                                                                                                    "e9ebe3")  # PatternFill("none")B8CCE4
+                                ws_created["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
+                                    "solid","e9ebe3")  # PatternFill("none")B8CCE4
 
                                 # print(row_all)
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].font = font_3  # "在线样式"
-                                ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].fill = PatternFill("solid",
-                                                                                                            "e9ebe3")  # PatternFill("none")B8CCE4
+                                ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].fill = PatternFill(
+                                    "solid","e9ebe3")  # PatternFill("none")B8CCE4
                                 col += 1
 
                         if ws_read_col == "P":
@@ -470,7 +445,6 @@ try:
 except:
     print("备注信息txt更名失败！（已存在同名文件）\n已存入{}.txt文件".format(date_today))
 
-
 # 转总表pdf可选项
 # excel_path_all = r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all))
 # pdf_path_all= r'{}\output_pdf\{}门课程.pdf'.format(path, len(set_course_name_all))
@@ -480,48 +454,46 @@ except:
 
 print("====================写入完成！====================")
 
-
 wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
 ws_read_all = wb_read.active
 week_max = int(ws_read_all["B{}".format(row_all_with_data)].value)
 wb_read.close()
 
-for week in range(1,week_max+1):
+for week in range(1, week_max + 1):
     wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
     ws_read_all = wb_read.active
-    row_read_all=4
-    count=4
-    first_day=True
-    week_date="date_error"
-    while count <= row_all_with_data: #写到这里才发现 ws.max_row就是最大行数 不改了
-        if int(ws_read_all["B{}".format(row_read_all)].value)!=week:
+    row_read_all = 4
+    count = 4
+    first_day = True
+    week_date = "date_error"
+    while count <= row_all_with_data:  # 写到这里才发现 ws.max_row就是最大行数 不改了
+        if int(ws_read_all["B{}".format(row_read_all)].value) != week:
             ws_read_all.delete_rows(row_read_all)
-            count +=1
-        else:
-            if first_day==True:
-                week_date=str(ws_read_all["C{}".format(row_read_all)].value)[0:11]
-                first_day=False
-            row_read_all+=1
             count += 1
-    ws_read_all["A1"].value="第{}周课表".format(week)
+        else:
+            if first_day == True:
+                week_date = str(ws_read_all["C{}".format(row_read_all)].value)[0:11]
+                first_day = False
+            row_read_all += 1
+            count += 1
+    ws_read_all["A1"].value = "第 {} 周课表".format(week)
     ws_read_all.row_dimensions[1].height = 50  # 周表标题行高
-    ws_read_all["A1"].font= font_title = Font(  # 表头样式
+    ws_read_all["A1"].font = font_title = Font(  # 表头样式
         name="华光准圆_CNKI",
         color="000000",
-        size=20,  # 设定文字大小
+        size=30,  # 设定文字大小
         bold=True,  # 设定为粗体
         italic=False  # 设定为斜体
     )
-
+    ws_read_all.column_dimensions['B'].width = 0.0  # 隐藏周次
 
     # 保存
-    wb_read.save(r'{}\output_date\excel\第{}周_{}.xlsx'.format(path, week,week_date))
-
+    wb_read.save(r'{}\output_date\excel\第{}周_{}.xlsx'.format(path, week, week_date))
 
     # 转pdf
-    excel_path=r'{}\output_date\excel\第{}周_{}.xlsx'.format(path, week,week_date)
-    pdf_path=r'{}\output_date\pdf\第{}周_{}.pdf'.format(path, week,week_date)
-    img_name="第{}周".format(week)
+    excel_path = r'{}\output_date\excel\第{}周_{}.xlsx'.format(path, week, week_date)
+    pdf_path = r'{}\output_date\pdf\第{}周_{}.pdf'.format(path, week, week_date)
+    img_name = "第{}周".format(week)
     excel_to_pdf(excel_path, pdf_path)
     # 转图片
     img_path = r'{}\output_date'.format(path)
