@@ -26,35 +26,35 @@ f_n = os.listdir(path)
 align = Alignment(horizontal='center', vertical='center', wrap_text=True)  # 剧中选项
 
 font_1 = Font(  # ”讲课“样式
-    name="华光准圆_CNKI",
+    name="华光准圆_CNKI", # 字体
     color="006100",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_2 = Font(  # ”实验“样式
-    name="华光准圆_CNKI",
+    name="华光准圆_CNKI", # 字体
     color="9C5700",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_3 = Font(  # "在线"样式
-    name="华光准圆_CNKI",
+    name="华光准圆_CNKI",# 字体
     color="757672",  # "545454"  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_4 = Font(  # ”讨论“样式 以及 “其他”样式
-    name="华光准圆_CNKI",
+    name="华光准圆_CNKI",# 字体
     color="9C0006",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
     italic=False  # 设定为斜体
 )
 font_5 = Font(  # 标题样式
-    name="华光准圆_CNKI",
+    name="华光准圆_CNKI",# 字体
     color="000000",  # 颜色
     size=11,  # 设定文字大小
     bold=False,  # 设定为粗体
@@ -62,8 +62,8 @@ font_5 = Font(  # 标题样式
 )
 
 font_title = Font(  # 表头样式
-    name="华光准圆_CNKI",
-    color="000000",  # 使用预置的颜色常量
+    name="华光准圆_CNKI",# 字体
+    color="000000",  # 颜色
     size=20,  # 设定文字大小
     bold=True,  # 设定为粗体
     italic=False  # 设定为斜体
@@ -202,6 +202,12 @@ if not os.path.exists(r"{}\output_pdf".format(path)):
     os.makedirs(r"{}\output_pdf".format(path))
 if not os.path.exists(r"{}\output_date".format(path)):
     os.makedirs(r"{}\output_date".format(path))  # images是否生成可选，路径在函数内生成
+
+if not os.path.exists(r"{}\output_date\excel".format(path)):
+    os.makedirs(r"{}\output_date\excel".format(path))
+if not os.path.exists(r"{}\output_date\pdf".format(path)):
+    os.makedirs(r"{}\output_date\pdf".format(path))
+
 
 
 # def sort_excel(excel_name):
@@ -464,19 +470,68 @@ try:
 except:
     print("备注信息txt更名失败！（已存在同名文件）\n已存入{}.txt文件".format(date_today))
 
+
 # 转总表pdf可选项
 # excel_path_all = r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all))
 # pdf_path_all= r'{}\output_pdf\{}门课程.pdf'.format(path, len(set_course_name_all))
 # excel_to_pdf(excel_path_all,pdf_path_all)
 # print(r'写入：output_pdf\{}门课程.pdf'.format(len(set_course_name_all)))
-# wb_read = load_workbook(r'{}\{}.xlsx'.format(path, os.path.splitext(file)[0]))
-# wb_read(r'{}\output\{}.xlsx'.format(path, new_filename(set_course_name)))
-# wb_read.close()
-# --------------------
-# ------
-#到是的f
+
 
 print("====================写入完成！====================")
+
+
+wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
+ws_read_all = wb_read.active
+week_max = int(ws_read_all["B{}".format(row_all_with_data)].value)
+wb_read.close()
+
+for week in range(1,week_max+1):
+    wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
+    ws_read_all = wb_read.active
+    row_read_all=4
+    count=4
+    first_day=True
+    week_date="date_error"
+    while count <= row_all_with_data: #写到这里才发现 ws.max_row就是最大行数 不改了
+        if int(ws_read_all["B{}".format(row_read_all)].value)!=week:
+            ws_read_all.delete_rows(row_read_all)
+            count +=1
+        else:
+            if first_day==True:
+                week_date=str(ws_read_all["C{}".format(row_read_all)].value)[0:11]
+                first_day=False
+            row_read_all+=1
+            count += 1
+    ws_read_all["A1"].value="第{}周课表".format(week)
+    ws_read_all.row_dimensions[1].height = 50  # 周表标题行高
+    ws_read_all["A1"].font= font_title = Font(  # 表头样式
+        name="华光准圆_CNKI",
+        color="000000",
+        size=20,  # 设定文字大小
+        bold=True,  # 设定为粗体
+        italic=False  # 设定为斜体
+    )
+
+
+    # 保存
+    wb_read.save(r'{}\output_date\excel\第{}周_{}.xlsx'.format(path, week,week_date))
+
+
+    # 转pdf
+    excel_path=r'{}\output_date\excel\第{}周_{}.xlsx'.format(path, week,week_date)
+    pdf_path=r'{}\output_date\pdf\第{}周_{}.pdf'.format(path, week,week_date)
+    img_name="第{}周".format(week)
+    excel_to_pdf(excel_path, pdf_path)
+    # 转图片
+    img_path = r'{}\output_date'.format(path)
+    pdf_to_imgs(pdf_path, img_path, img_name)
+
+    wb_read.close()
+    print("生成：第{}周课表".format(week))
+
+print("====================写入完成！====================")
+input("注意检查备注信息（output文件夹中）\n输入‘1’退出：")
 
 # ver 1.0 2023.9.2
 # Copyright (c) 2023 CDH
