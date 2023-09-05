@@ -12,7 +12,7 @@ import win32com.client as win32  # pip install pywin32  #用于格式转化
 from win32com.client import DispatchEx
 import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
-
+import shutil
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
 
@@ -169,6 +169,15 @@ def pdf_to_imgs(pdf_path, imgs_path, imgs_name):
     # page = pdfDoc.loadPage(0)  # PDF页数
     # pix = page.getPixmap()
     # pix.writePNG(imgs_path)  # 保存 此路径格式不同
+i=1
+for file in f_n:
+    if os.path.isfile(r'{}\{}'.format(path, file)) and os.path.splitext(file)[1].lower() == ".zip" :
+        shutil.unpack_archive(r'{}\{}'.format(path, file), r'{}'.format(path))
+        os.remove(r'{}\{}'.format(path, file))  # 删除下载的压缩文件
+        os.renames(r'{}\{}.xls'.format(path,"教学进度表" ), r'{}\{}.xls'.format(path,i))
+        i+=1
+f_n = os.listdir(path)
+
 
 
 if not os.path.exists(r"{}\output".format(path)):  # 生成output文件夹
@@ -417,7 +426,13 @@ for file in f_n:
         new_source_file_name = r'{}\{}(origin).xlsx'.format(path, new_filename(set_course_name),
                                                             os.path.splitext(file)[0])
         os.renames(old_source_file_name, new_source_file_name + "0")
-        os.renames(new_source_file_name + "0", new_source_file_name)
+        try:
+            os.renames(new_source_file_name + "0", new_source_file_name)
+        except:
+            print("++++++++++++出错了！请检查是否下载了重复的教学进程表++++++++++++")
+            print("请删除旧文件和生成的文件，重新下载后再试一次")
+            input("输入“1”退出：")
+            exit(1)
 
 ws_created_all["A1"].value = "{}".format(new_filename(set_course_name_all))  # 写入表头
 ws_created_all["A3"].value = "课程名称"
@@ -503,7 +518,7 @@ for week in range(1, week_max + 1):
     print("生成：第{}周课表".format(week))
 
 print("====================写入完成！====================")
-input("注意检查备注信息（output文件夹中）\n输入‘1’退出：")
+input("注意检查备注信息（output文件夹中）\n输入‘0’退出：")
 
 # ver 1.0 2023.9.2
 # Copyright (c) 2023 CDH
