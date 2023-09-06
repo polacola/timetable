@@ -14,6 +14,7 @@ import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
 import shutil
 
+ver="v0.3.0"
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
 
@@ -89,6 +90,7 @@ def set_font(read_col, cell, ws_new_in_set, row_in_set, Y, col_list):
         for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
             ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_3
             ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "e9ebe3")
+            #print("由于课程性质设置为 在线{}行-------------------".format(row_in_set)) #删除
             col += 1
     elif read_col == Y and cell.value == "讨论":
         col = 0
@@ -245,10 +247,11 @@ ws_created_all.row_dimensions[1].height = 100  # 总表标题行高
 
 ws_created_all.merge_cells("A1:I1")
 ws_created_all.merge_cells("A2:I2")
-ws_created_all["A2"].value = "                  ver1.0 by CDH{}".format(time.strftime("%Y", time.localtime()))
+ws_created_all["A2"].value = "                  {} by CDH{}".format(ver,time.strftime("%Y", time.localtime()))
 ws_created_all["A2"].alignment = align
 ws_created_all["A2"].font = Font(name="华光准圆_CNKI", size=8, bold=False, italic=True)
 row_all = 3  # 从第三行开始
+flag_first_course=True
 temp = 3
 row_number_last_read = 0
 count_title_all = 0
@@ -289,7 +292,7 @@ for file in f_n:
 
             ws_created.merge_cells("A1:I1")
             ws_created.merge_cells("A2:I2")
-            ws_created["A2"].value = "                  ver1.0 by CDH{}".format(time.strftime("%Y", time.localtime()))
+            ws_created["A2"].value = "                  {} by CDH{}".format(ver,time.strftime("%Y", time.localtime()))
             ws_created["A2"].alignment = align
             ws_created["A2"].font = Font(name="华光准圆_CNKI", size=8, bold=False, italic=True)
 
@@ -332,6 +335,11 @@ for file in f_n:
                             ws_created_all['{}{}'.format(ws_creat_col, row_all)].value = str(
                                 ws_read["H{}".format(row)].value).replace(
                                 "\n", "")
+                            # 补丁===================================================
+                            ws_created_all["J{}".format(row_all)].value = str(ws_read["R{}".format(row)].value)+" "
+                            ws_created_all["K{}".format(row_all)].value = str(ws_read["S{}".format(row)].value)+" "
+                            # 补丁===================================================# "R"存入j便于重新上色 "S"存入k便于重新上色  十分丑陋
+                            # mark
                         elif ws_read_col == "G":  # 更改“节次”为文本，便于排序
                             ws_created_all['{}{}'.format(ws_creat_col, row_all)].value = str(each_cell.value).replace(
                                 "\n", "")
@@ -340,13 +348,13 @@ for file in f_n:
                         else:
                             ws_created_all['{}{}'.format(ws_creat_col, row_all)].value = str(each_cell.value).replace(
                                 "\n", "")
-                            # 补丁===================================================
-                            ws_created_all["J{}".format(row_all)].value = str(ws_read["R{}".format(row)].value)
-                            ws_created_all["K{}".format(row_all)].value = str(ws_read["S{}".format(row)].value)
-                            # 补丁===================================================# "R"存入j便于重新上色 "S"存入k便于重新上色  十分丑陋
-                            # mark 有空就修
+                            # # 补丁===================================================
+                            # ws_created_all["J{}".format(row_all)].value = str(ws_read["R{}".format(row)].value)
+                            # ws_created_all["K{}".format(row_all)].value = str(ws_read["S{}".format(row)].value)
+                            # # 补丁===================================================# "R"存入j便于重新上色 "S"存入k便于重新上色  十分丑陋
+                            # # mark 有空就修  放在这里不对
                         set_font(ws_read_col, each_cell, ws_created, row, "Y", "ABCDEFGHI")  # 设置当前行样式
-                        set_font(ws_read_col, each_cell, ws_created_all, row_all, "Y", "ABCDEFGHIJK")  # mark
+                        set_font(ws_read_col, each_cell, ws_created_all, row_all, "Y", "ABCDEFGHI")  # mark
                         # print("-------------------------------------row_all设置样式=" + str(row_all))#调试
                         if flag == True:
                             row_all -= 1  # 标题行在总表只用写一遍，所以row_all要往回一行
@@ -359,12 +367,15 @@ for file in f_n:
                 elif (ws_read_col == "R" or ws_read_col == "S") or (ws_read_col == "P"):
 
                     count_print = 0
-                    row += 1  # col初始为4 因为有标题
+                    row += 1  # col初始为4 因为有标题 有bug
                     # print("-------------------------------------row_all=" + str(row_all))#调试
                     if ws_read_col == "P":
                         row_all = last_temp
                         # rint("-------------------------------------row_all=" + str(row_all))#调试
-                    for each_cell in colA_To_P[3:-2]:
+                    if flag_first_course:
+                        row_all+=1
+
+                    for each_cell in colA_To_P[3:-2]:  #原本未3:2 有bug
                         if (each_cell.value != "" and ws_read_col != "P") or (
                                 ("在线" in each_cell.value) or ("钉钉" in each_cell.value) or (
                                 "直播" in each_cell.value) or ("更大" in each_cell.value) or (
@@ -388,15 +399,15 @@ for file in f_n:
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
                                     "solid", "e9ebe3")  # PatternFill("none")B8CCE4
-
+                                #print("-------------------------------------row由于备注被设置为在线样式=" + str(row))  # 调试
                                 # print(row_all)
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].font = font_3  # "在线样式"
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].fill = PatternFill(
                                     "solid", "e9ebe3")  # PatternFill("none")B8CCE4
-                                # print("-------------------------------------row_all由于备注被设置为在线样式=" + str(row_all)) #调试
+                                #print("-------------------------------------row_all由于备注被设置为在线样式=" + str(row_all)) #调试
                                 col += 1
 
-                        if ws_read_col == "P":
+                        if ws_read_col == "P" and row!=3:
                             set_course_name.add(str(ws_read["H{}".format(row)].value).replace(" ", ""))
                             set_course_name_all.add(str(ws_read["H{}".format(row)].value).replace(" ", ""))
 
@@ -439,6 +450,7 @@ for file in f_n:
             print(r'写入：output\{}.xlsx'.format(img_name))  # 名称都是new_filename(set_course_name)
             print(r'写入：output_pdf\{}.pdf'.format(img_name))
             print(r'写入：output_images\{}.png'.format(img_name))
+            flag_first_course = False
             print("====================写入完成！====================")
             with open(r'{}\output\备注信息_{}.txt'.format(path, date_today), "a", encoding="utf-8") as f:
                 f.write(r'--------以上是【{}】的备注信息--------'.format(new_filename(set_course_name)) + "\n\n")
@@ -486,17 +498,19 @@ for ws_read_col in "IFJK":
         for each_cell in colI_K[3:]:
             try:
                 if ("在线" in each_cell.value) or ("钉钉" in each_cell.value) or (  # 不知道为什么会报错，“None”不可迭代 可是前面相同代码没问题
-                        "直播" in each_cell.value) or ("更大" in each_cell.value) or (
+                        "直播" in each_cell.value) or ("更大" in each_cell.value) or (      #v0.3.1更新 找到原因 就算没内容也要写
                         "线上" in each_cell.value):
                     col = 0
                     for each_cell_wb in "abcdefghi":
                         ws_read["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
                         ws_read["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
                             "solid", "e9ebe3")  # PatternFill("none")B8CCE4
+                        #print("排序后由于备注{}{}{}设置为 在线{}行-------------------".format(ws_read_col,row,each_cell.value,row))#调试
                         col += 1
                 row += 1
             except:
                 continue
+                row += 1
 ws_read.delete_cols(10)
 ws_read.delete_cols(10)
 wb_read.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 保存回原位置
@@ -574,6 +588,6 @@ for week in range(1, week_max + 1):
 print("====================写入完成！====================")
 input("注意检查备注信息（output文件夹中）\n输入‘0’退出：")
 
-# ver 1.0 2023.9.2
+# ver 0.3.0 2023.9.5
 # Copyright (c) 2023 CDH
 # molu2003@foxmail.com
