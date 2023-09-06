@@ -85,11 +85,11 @@ def set_font(read_col, cell, ws_new_in_set, row_in_set, Y, col_list):
             ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_2
             ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "FFEB9C")
             col += 1
-    elif read_col == Y and cell.value == "在线":
+    elif read_col == Y and cell.value == "在线":  #v0.3.2   e9ebe3 --》 D4F2E7--》F5F5DC
         col = 0
         for each_cell_wb in "abcdefghi":  # ws_new_in_set["{}".format(row_in_set)]:
             ws_new_in_set["{}{}".format(col_list[col], row_in_set)].font = font_3
-            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "e9ebe3")
+            ws_new_in_set["{}{}".format(col_list[col], row_in_set)].fill = PatternFill("solid", "F5F5DC")
             #print("由于课程性质设置为 在线{}行-------------------".format(row_in_set)) #删除
             col += 1
     elif read_col == Y and cell.value == "讨论":
@@ -398,12 +398,12 @@ for file in f_n:
                             for each_cell_wb in ws_created["{}".format(row)]:
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
                                 ws_created["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
-                                    "solid", "e9ebe3")  # PatternFill("none")B8CCE4
+                                    "solid", "F5F5DC")  # PatternFill("none")B8CCE4
                                 #print("-------------------------------------row由于备注被设置为在线样式=" + str(row))  # 调试
                                 # print(row_all)
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].font = font_3  # "在线样式"
                                 ws_created_all["{}{}".format("ABCDEFGHI"[col], row_all)].fill = PatternFill(
-                                    "solid", "e9ebe3")  # PatternFill("none")B8CCE4
+                                    "solid", "F5F5DC")  # PatternFill("none")B8CCE4
                                 #print("-------------------------------------row_all由于备注被设置为在线样式=" + str(row_all)) #调试
                                 col += 1
 
@@ -504,7 +504,7 @@ for ws_read_col in "IFJK":
                     for each_cell_wb in "abcdefghi":
                         ws_read["{}{}".format("ABCDEFGHI"[col], row)].font = font_3  # "在线样式"
                         ws_read["{}{}".format("ABCDEFGHI"[col], row)].fill = PatternFill(
-                            "solid", "e9ebe3")  # PatternFill("none")B8CCE4
+                            "solid", "F5F5DC")  # PatternFill("none")B8CCE4
                         #print("排序后由于备注{}{}{}设置为 在线{}行-------------------".format(ws_read_col,row,each_cell.value,row))#调试
                         col += 1
                 row += 1
