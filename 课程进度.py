@@ -14,7 +14,8 @@ import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
 import shutil
 
-ver="v0.3.0"
+ver="v0.3.3"
+space="       "
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
 
@@ -229,6 +230,7 @@ def sort_excel(excel_name):  # 注意！此排序不会带着单元格样式一�
 
 date_today = time.strftime("%Y-%m-%d", time.localtime())
 with open(r'{}\output\备注信息_{}.txt'.format(path, date_today), "w", encoding="utf-8") as f:
+    f.write("github.com/polacola/timetable {} by CDH{}\n".format(ver,time.strftime("%Y", time.localtime())))
     f.write(
         f'================以下是备注信息，请仔细核对{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}================\n')
 
@@ -247,7 +249,7 @@ ws_created_all.row_dimensions[1].height = 100  # 总表标题行高
 
 ws_created_all.merge_cells("A1:I1")
 ws_created_all.merge_cells("A2:I2")
-ws_created_all["A2"].value = "                  {} by CDH{}".format(ver,time.strftime("%Y", time.localtime()))
+ws_created_all["A2"].value = " {}github.com/polacola/timetable {} by CDH{}".format(space,ver,time.strftime("%Y", time.localtime()))
 ws_created_all["A2"].alignment = align
 ws_created_all["A2"].font = Font(name="华光准圆_CNKI", size=8, bold=False, italic=True)
 row_all = 3  # 从第三行开始
@@ -292,7 +294,7 @@ for file in f_n:
 
             ws_created.merge_cells("A1:I1")
             ws_created.merge_cells("A2:I2")
-            ws_created["A2"].value = "                  {} by CDH{}".format(ver,time.strftime("%Y", time.localtime()))
+            ws_created["A2"].value = "{}github.com/polacola/timetable {} by CDH{}".format(space,ver,time.strftime("%Y", time.localtime()))
             ws_created["A2"].alignment = align
             ws_created["A2"].font = Font(name="华光准圆_CNKI", size=8, bold=False, italic=True)
 
