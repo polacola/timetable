@@ -14,7 +14,7 @@ import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
 import shutil
 
-ver="v0.3.3"
+ver="v0.3.4"
 space="       "
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
@@ -481,10 +481,36 @@ ws_created_all.sheet_properties.pageSetUpPr.fitToPage = True  # 调整为一页 
 ws_created_all.page_setup.fitToHeight = False
 
 row_all_with_data = len(ws_created_all["I"])  # 总表行数
+
+# 解决两位节次排序出现的问题 对一位数的节次前面加0
+i=4
+while i <= row_all_with_data:
+    if len(str(ws_created_all["E{}".format(i)].value)) <=4:
+        ws_created_all["E{}".format(i)].value="0"+ws_created_all["E{}".format(i)].value
+    i+=1
+
+
+
 wb_new_all.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 将创建的工作簿保存
 
 wb_new_all.close()  # 最后关闭文件
 sort_excel(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 再改一版
+
+
+#排完序再删掉
+wb_new_all = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 读取源文件
+ws_created_all = wb_new_all[wb_new_all.sheetnames[0]]  # 反正只会有一张sheet
+i=4
+while i <= row_all_with_data:
+    if str(ws_created_all["E{}".format(i)].value)[0] =="0":
+        ws_created_all["E{}".format(i)].value=str(ws_created_all["E{}".format(i)].value)[1:]
+    i+=1
+
+wb_new_all.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 将创建的工作簿保存
+wb_new_all.close()  # 最后关闭文件
+
+
+
 # =======================施工现场============================
 wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 读取排好序的文件
 ws_read = wb_read[wb_read.sheetnames[0]]  # 反正只会有一张sheet
