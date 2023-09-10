@@ -10,4 +10,6 @@
 需要自行安装字体 华光准圆_CNKI 若未安装将使用默认字体
 
 适用于温州医科大学（正方教务系统）的表格格式。
+视频教程：
+https://www.bilibili.com/video/BV1xk4y1A7HU
 
