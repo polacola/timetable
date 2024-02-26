@@ -14,7 +14,7 @@ import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
 import shutil
 
-ver="v0.3.4"
+ver="v0.3.5"
 space="       "
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
@@ -260,11 +260,13 @@ count_title_all = 0
 # count_print_imgs=0
 flag = False
 # ============================================================
-for file in f_n:
+from tqdm import tqdm
+print("====================生成课表====================")
+for file in tqdm(f_n):
     if os.path.isfile(r'{}\{}'.format(path, file)) and (os.path.splitext(file)[1].lower() == ".xls" or
                                                         os.path.splitext(file)[
                                                             1].lower() == ".xlsx"):  # openpyxl 不支持xls
-        print("分析源文件：" + file)
+        # print("分析源文件：" + file) #提示信息
         if os.path.splitext(file)[1] == ".xls":
             filename = r'{}\{}'.format(path, file)
             Excelapp = win32.gencache.EnsureDispatch(
@@ -449,11 +451,11 @@ for file in f_n:
             img_path = r'{}\output_images'.format(path)
             pdf_to_imgs(pdf_path, img_path, img_name)
 
-            print(r'写入：output\{}.xlsx'.format(img_name))  # 名称都是new_filename(set_course_name)
-            print(r'写入：output_pdf\{}.pdf'.format(img_name))
-            print(r'写入：output_images\{}.png'.format(img_name))
+            # print(r'写入：output\{}.xlsx'.format(img_name))  # 名称都是new_filename(set_course_name) #提示信息
+            # print(r'写入：output_pdf\{}.pdf'.format(img_name))
+            # print(r'写入：output_images\{}.png'.format(img_name))
             flag_first_course = False
-            print("====================写入完成！====================")
+            # print("====================写入完成！====================") #提示信息
             with open(r'{}\output\备注信息_{}.txt'.format(path, date_today), "a", encoding="utf-8") as f:
                 f.write(r'--------以上是【{}】的备注信息--------'.format(new_filename(set_course_name)) + "\n\n")
         wb_read.close()  # 关闭
@@ -545,11 +547,11 @@ wb_read.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)
 wb_read.close()
 # =======================原来我写得这么恶心============================
 
-print(r'写入：output\{}门课程.xlsx'.format(len(set_course_name_all)))
+# print(r'写入：output\{}门课程.xlsx'.format(len(set_course_name_all))) #提示信息
 
 old_txt_file_name = r'{}\output\备注信息_{}.txt'.format(path, date_today)  # 重命名备注txt
 new_txt_file_name = r'{}\output\{}门课程_备注信息_{}.txt'.format(path, len(set_course_name_all), date_today)
-print(r'写入：output\{}门课程_备注信息'.format(len(set_course_name_all)))
+# print(r'写入：output\{}门课程_备注信息'.format(len(set_course_name_all))) #提示信息
 try:
     os.renames(old_txt_file_name, new_txt_file_name)
 
@@ -560,17 +562,18 @@ except:
 # excel_path_all = r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all))
 # pdf_path_all= r'{}\output_pdf\{}门课程.pdf'.format(path, len(set_course_name_all))
 # excel_to_pdf(excel_path_all,pdf_path_all)
-# print(r'写入：output_pdf\{}门课程.pdf'.format(len(set_course_name_all)))
+# print(r'写入：output_pdf\{}门课程.pdf'.format(len(set_course_name_all))) #提示信息
 
 
-print("====================写入完成！====================")
+# print("====================写入完成！====================") #提示信息
+print("====================生成周表====================")
 
 wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
 ws_read_all = wb_read.active
 week_max = int(ws_read_all["B{}".format(row_all_with_data)].value)
 wb_read.close()
 
-for week in range(1, week_max + 1):
+for week in tqdm(range(1, week_max + 1)):
     wb_read = load_workbook(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
     ws_read_all = wb_read.active
     row_read_all = 4
@@ -611,7 +614,7 @@ for week in range(1, week_max + 1):
     pdf_to_imgs(pdf_path, img_path, img_name)
 
     wb_read.close()
-    print("生成：第{}周课表".format(week))
+    # print("生成：第{}周课表".format(week))
 
 print("====================写入完成！====================")
 input("注意检查备注信息（output文件夹中）\n输入‘0’退出：")
