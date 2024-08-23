@@ -14,7 +14,8 @@ import fitz  # pdf转图片  #PyMuPDF
 import xlwings as xw
 import shutil
 
-ver="v0.3.5"
+
+ver="v0.3.6"
 space="       "
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
@@ -225,6 +226,7 @@ def sort_excel(excel_name):  # 注意！此排序不会带着单元格样式一�
 
     sht.range('A4:K{}'.format(row_all_with_data)).value = sort_df.values.tolist()  # 临时修改I-》K
     wb.save(excel_name)
+    wb.close()
     app.quit()
 
 
@@ -507,9 +509,13 @@ while i <= row_all_with_data:
     if str(ws_created_all["E{}".format(i)].value)[0] =="0":
         ws_created_all["E{}".format(i)].value=str(ws_created_all["E{}".format(i)].value)[1:]
     i+=1
-
-wb_new_all.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 将创建的工作簿保存
-wb_new_all.close()  # 最后关闭文件
+temp_save_path = r'{}\output\{}_temp.xlsx'.format(path, len(set_course_name_all))
+wb_new_all.save(temp_save_path)
+#wb_new_all.save(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))  # 将创建的工作簿保存
+wb_new_all.close()  # 最后关闭文件、
+if os.path.exists(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all))):
+    os.remove(r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
+os.rename(temp_save_path, r'{}\output\{}门课程.xlsx'.format(path, len(set_course_name_all)))
 
 
 
