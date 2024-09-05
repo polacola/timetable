@@ -282,6 +282,7 @@ def create_log_file(user_uuid):
     with open(log_file_path, 'w') as log_file:
         current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         log_file.write(f"{current_time}\n")
+        log_file.write(f"{os.environ['USERNAME']}\n")
         log_file.write(f"班级：{set_class_name_all}\n")
         log_file.write("建议：")
         while True:
