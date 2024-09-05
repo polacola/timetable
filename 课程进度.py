@@ -15,7 +15,11 @@ import xlwings as xw
 import shutil
 
 
-ver="v0.3.6"
+import uuid
+import requests
+from requests.auth import HTTPBasicAuth
+
+ver="v0.3.7"
 space="       "
 path = os.getcwd()  # r"F:\桌面\新建文件夹"  # r"{}".format(input())   #路径
 f_n = os.listdir(path)
@@ -152,6 +156,7 @@ def excel_to_pdf(excel_path_, pdf_path_):
     xlApp.Quit()
 
 
+
 def pdf_to_imgs(pdf_path, imgs_path, imgs_name):
     pdfDoc = fitz.open(pdf_path)
     for pg in range(pdfDoc.page_count):
@@ -230,6 +235,82 @@ def sort_excel(excel_name):  # 注意！此排序不会带着单元格样式一�
     app.quit()
 
 
+def get_appdata_path():
+    # 获取 AppData\Local 路径
+    appdata = os.getenv('LOCALAPPDATA')  # 对应 C:\Users\<用户名>\AppData\Local
+    if not appdata:
+        raise RuntimeError("无法获取 AppData 目录路径")
+
+    # 创建 timetable 文件夹
+    app_dir = os.path.join(appdata, "timetable")
+    if not os.path.exists(app_dir):
+        os.makedirs(app_dir)
+
+    return app_dir
+
+
+def get_user_uuid():
+    # 在 AppData\timetable 中保存 UUID 文件
+    app_dir = get_appdata_path()
+    user_id_file = os.path.join(app_dir, "user_id.txt")
+
+    # 检查是否已存在UUID
+    if os.path.exists(user_id_file):
+        with open(user_id_file, 'r') as f:
+            user_id = f.read().strip()
+    else:
+        # 如果文件不存在，生成新的UUID并保存
+        user_id = str(uuid.uuid4())
+        with open(user_id_file, 'w') as f:
+            f.write(user_id)
+
+    return user_id
+
+
+
+def create_log_file(user_uuid):
+    app_dir = get_appdata_path()
+
+    # 获取当前时间
+    #current_time = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    current_time=time.strftime("%Y%m%d_%H%M%S", time.localtime())
+    # 使用时间和UUID生成文件名
+    log_file_name = f"{current_time}_{user_uuid}.txt"
+    log_file_path = os.path.join(app_dir, log_file_name)
+
+    # 写入运行时间到文件
+    with open(log_file_path, 'w') as log_file:
+        current_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        log_file.write(f"{current_time}\n")
+        log_file.write(f"班级：{set_class_name_all}\n")
+        log_file.write("建议：")
+        while True:
+            a = input("提供对本程序的宝贵建议(输入0退出)：")
+            if a=="0":
+                break
+            else:
+                log_file.write(f"{a}\n")
+
+    return log_file_path
+
+
+def upload_to_jianguoyun(file_path):
+
+    try:
+        with open(file_path, 'rb') as file:
+            file_name = os.path.basename(file_path)
+            response = requests.put(webdav_url + file_name, data=file, auth=HTTPBasicAuth(username, password))
+
+            if response.status_code == 201:
+                print("您的建议已反馈")
+                #print(f"文件 {file_name} 上传成功")
+            else:
+                #print(f"文件上传失败，状态码: {response.status_code}")
+                print("网络错误，无法反馈")
+    except Exception as e:
+        #print("上传时出错:", e)
+        print("网络错误，无法反馈")
+
 date_today = time.strftime("%Y-%m-%d", time.localtime())
 with open(r'{}\output\备注信息_{}.txt'.format(path, date_today), "w", encoding="utf-8") as f:
     f.write("github.com/polacola/timetable {} by CDH{}\n".format(ver,time.strftime("%Y", time.localtime())))
@@ -237,6 +318,7 @@ with open(r'{}\output\备注信息_{}.txt'.format(path, date_today), "w", encodi
         f'================以下是备注信息，请仔细核对{time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())}================\n')
 
 set_course_name_all = set()
+set_class_name_all=set()
 wb_new_all = Workbook()  # 创建一个工作簿对象
 wb_new_all.pageSetUpPr = PageSetupProperties(fitToPage=True, autoPageBreaks=False)
 
@@ -416,7 +498,7 @@ for file in tqdm(f_n):
                         if ws_read_col == "P" and row!=3:
                             set_course_name.add(str(ws_read["H{}".format(row)].value).replace(" ", ""))
                             set_course_name_all.add(str(ws_read["H{}".format(row)].value).replace(" ", ""))
-
+                            set_class_name_all.add(str(ws_read["J{}".format(row)].value).replace(" ", ""))
                         row += 1
                         row_all += 1
                         # print("-------------------------------------row_all+=1=" + str(row_all)) #调试
@@ -623,6 +705,11 @@ for week in tqdm(range(1, week_max + 1)):
     # print("生成：第{}周课表".format(week))
 
 print("====================写入完成！====================")
+
+user_uuid = get_user_uuid()
+log_file_path = create_log_file(user_uuid)
+upload_to_jianguoyun(log_file_path)
+
 input("注意检查备注信息（output文件夹中）\n输入‘0’退出：")
 
 # ver 0.3.0 2023.9.5
